@@ -92,9 +92,9 @@ It loads sample tickets, validates transaction history JSON, calls the analyzer 
 
 ## Vercel Deployment
 
-This repository includes Vercel configuration:
+This repository includes Vercel configuration that avoids `uv lock` and uses `requirements.txt`:
 
-- `pyproject.toml` defines the Python project/dependencies and sets `app.main:app` as the Vercel ASGI entrypoint.
+- `api/index.py` imports the FastAPI app for Vercel serverless routing.
 - `.python-version` pins Python `3.12`.
 - `public/` contains the static interface assets.
 

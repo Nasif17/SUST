@@ -133,3 +133,10 @@ def test_api_aliases_match_required_endpoints() -> None:
     assert required_path.status_code == 200
     assert api_alias.status_code == 200
     assert api_alias.json() == required_path.json()
+
+
+
+def test_vercel_entrypoint_uses_fastapi_app() -> None:
+    from api.index import app as vercel_app
+
+    assert vercel_app is app
