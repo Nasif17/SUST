@@ -100,3 +100,36 @@ def test_prompt_injection_in_complaint_is_ignored() -> None:
     assert body["relevant_transaction_id"] == "TXN-B"
     assert "prompt_injection_ignored" in body["reason_codes"]
     assert "we will refund" not in body["customer_reply"].casefold()
+
+
+def test_interface_and_assets_are_served() -> None:
+    client = TestClient(app)
+
+    page = client.get("/")
+    assert page.status_code == 200
+    assert "QueueStorm Investigator" in page.text
+    assert "Ticket Analyzer" in page.text
+
+    css = client.get("/styles.css")
+    assert css.status_code == 200
+    assert "text/css" in css.headers["content-type"]
+    assert ".workspace" in css.text
+
+    script = client.get("/app.js")
+    assert script.status_code == 200
+    assert "javascript" in script.headers["content-type"]
+    assert "fetchWithFallback" in script.text
+
+
+def test_api_aliases_match_required_endpoints() -> None:
+    client = TestClient(app)
+
+    assert client.get("/api/health").json() == client.get("/health").json()
+
+    payload = SAMPLES["cases"][0]["input"]
+    required_path = client.post("/analyze-ticket", json=payload)
+    api_alias = client.post("/api/analyze-ticket", json=payload)
+
+    assert required_path.status_code == 200
+    assert api_alias.status_code == 200
+    assert api_alias.json() == required_path.json()

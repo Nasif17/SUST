@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QueueStorm Investigator</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SUST CSE Carnival 2026</p>
+        <h1>QueueStorm Investigator</h1>
+      </div>
+      <nav class="navlinks" aria-label="API links">
+        <a href="/docs">Docs</a>
+        <a href="/health">Health</a>
+        <span id="healthBadge" class="status-badge status-waiting">Checking</span>
+      </nav>
+    </header>
+
+    <main class="workspace">
+      <section class="panel input-panel" aria-labelledby="inputTitle">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Request</p>
+            <h2 id="inputTitle">Ticket Analyzer</h2>
+          </div>
+          <div class="actions">
+            <select id="sampleSelect" aria-label="Sample case">
+              <option value="0">Wrong transfer</option>
+              <option value="1">Failed payment</option>
+              <option value="2">Phishing report</option>
+              <option value="3">Duplicate payment</option>
+            </select>
+            <button id="loadSample" type="button" class="secondary">Load</button>
+          </div>
+        </div>
+
+        <form id="ticketForm" class="form-grid">
+          <label>
+            Ticket ID
+            <input id="ticketId" name="ticket_id" required />
+          </label>
+
+          <label>
+            Language
+            <select id="language" name="language">
+              <option value="en">en</option>
+              <option value="bn">bn</option>
+              <option value="mixed">mixed</option>
+            </select>
+          </label>
+
+          <label>
+            Channel
+            <select id="channel" name="channel">
+              <option value="in_app_chat">in_app_chat</option>
+              <option value="call_center">call_center</option>
+              <option value="email">email</option>
+              <option value="merchant_portal">merchant_portal</option>
+              <option value="field_agent">field_agent</option>
+            </select>
+          </label>
+
+          <label>
+            User Type
+            <select id="userType" name="user_type">
+              <option value="customer">customer</option>
+              <option value="merchant">merchant</option>
+              <option value="agent">agent</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </label>
+
+          <label class="span-all">
+            Complaint
+            <textarea id="complaint" name="complaint" required rows="6"></textarea>
+          </label>
+
+          <label class="span-all">
+            Campaign Context
+            <input id="campaignContext" name="campaign_context" />
+          </label>
+
+          <label class="span-all">
+            Transaction History JSON
+            <textarea id="transactions" name="transaction_history" rows="10" spellcheck="false"></textarea>
+          </label>
+
+          <div class="form-actions span-all">
+            <button id="runButton" type="submit">Run Analysis</button>
+            <button id="resetButton" type="button" class="secondary">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel result-panel" aria-labelledby="resultTitle">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Response</p>
+            <h2 id="resultTitle">Decision Output</h2>
+          </div>
+          <button id="copyResult" type="button" class="secondary">Copy JSON</button>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+          <div class="signal-grid" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <p>Ready</p>
+        </div>
+
+        <div id="resultView" class="result-view hidden">
+          <div class="summary-row">
+            <div>
+              <span class="metric-label">Case Type</span>
+              <strong id="caseType">-</strong>
+            </div>
+            <div>
+              <span class="metric-label">Verdict</span>
+              <strong id="verdict">-</strong>
+            </div>
+            <div>
+              <span class="metric-label">Severity</span>
+              <strong id="severity">-</strong>
+            </div>
+          </div>
+
+          <div class="route-strip">
+            <span id="department">department</span>
+            <span id="transactionId">transaction</span>
+            <span id="reviewFlag">review</span>
+            <span id="confidence">confidence</span>
+          </div>
+
+          <div class="meter" aria-label="Confidence">
+            <span id="confidenceBar"></span>
+          </div>
+
+          <dl class="detail-list">
+            <dt>Agent Summary</dt>
+            <dd id="agentSummary"></dd>
+            <dt>Recommended Next Action</dt>
+            <dd id="nextAction"></dd>
+            <dt>Customer Reply</dt>
+            <dd id="customerReply"></dd>
+            <dt>Reason Codes</dt>
+            <dd id="reasonCodes"></dd>
+          </dl>
+
+          <pre id="rawJson" class="raw-json"></pre>
+        </div>
+
+        <div id="errorBox" class="error-box hidden" role="alert"></div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
+

@@ -1,11 +1,16 @@
 # QueueStorm Investigator
 
-FastAPI solution for the SUST CSE Carnival 2026 Codex Community Hackathon preliminary round. It exposes the required:
+FastAPI solution for the SUST CSE Carnival 2026 Codex Community Hackathon preliminary round. It now ships with a browser interface for trying the analyzer before deployment.
+
+The required API endpoints remain:
 
 - `GET /health`
 - `POST /analyze-ticket`
 
-The service analyzes mobile financial support tickets, matches complaint evidence against synthetic transaction history, routes the case to the correct team, and returns a safe customer-facing reply.
+Vercel-friendly aliases are also available:
+
+- `GET /api/health`
+- `POST /api/analyze-ticket`
 
 ## Quick Start
 
@@ -18,6 +23,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 Open:
 
+- Interface: `http://localhost:8000/`
 - Health: `http://localhost:8000/health`
 - API docs: `http://localhost:8000/docs`
 
@@ -27,7 +33,7 @@ Open:
 pytest
 ```
 
-The tests run the public sample cases in `SUST_Preli_Sample_Cases.json` and verify the core judging fields, response shape, and safety rules.
+The tests run the public sample cases in `SUST_Preli_Sample_Cases.json` and verify the core judging fields, response shape, safety rules, UI serving, static assets, and `/api` aliases.
 
 ## API
 
@@ -73,6 +79,34 @@ Returns the required fields:
 - `human_review_required`
 - `confidence`
 - `reason_codes`
+
+## Interface
+
+The web UI is served from `public/` by the FastAPI app:
+
+- `public/index.html`
+- `public/styles.css`
+- `public/app.js`
+
+It loads sample tickets, validates transaction history JSON, calls the analyzer endpoint, shows route/severity/confidence, and displays the raw JSON response.
+
+## Vercel Deployment
+
+This repository includes Vercel configuration:
+
+- `pyproject.toml` sets the ASGI entrypoint to `app.main:app`.
+- `.python-version` pins Python `3.12`.
+- `vercel.json` excludes tests, PDFs, cache files, and local server logs from the serverless bundle.
+- `public/` contains the static interface assets.
+
+Deploy with the Vercel dashboard or CLI from the repository root. After deployment, verify:
+
+```text
+https://your-project.vercel.app/
+https://your-project.vercel.app/health
+https://your-project.vercel.app/analyze-ticket
+https://your-project.vercel.app/docs
+```
 
 ## AI / Model Usage
 
@@ -123,22 +157,6 @@ The analyzer compares the complaint with `transaction_history` using:
 - `consistent`: complaint aligns with transaction evidence;
 - `inconsistent`: a likely transaction exists, but evidence contradicts part of the claim;
 - `insufficient_data`: the service cannot identify a safe, specific transaction.
-
-## Deployment
-
-Any Python hosting platform that supports ASGI can run the app.
-
-Typical start command:
-
-```bash
-uvicorn app.main:app --host 0.0.0.0 --port $PORT
-```
-
-If the platform does not set `PORT`, use:
-
-```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
 
 ## Limitations
 
