@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from app import __version__
 from app.analyzer import analyze_ticket
@@ -28,19 +28,33 @@ app.add_middleware(
 )
 
 
+def _file_or_fallback(path: Path, *, media_type: str, fallback: str) -> FileResponse | Response:
+    if path.exists():
+        return FileResponse(path, media_type=media_type)
+    return Response(content=fallback, media_type=media_type)
+
+
 @app.get("/", include_in_schema=False)
-def interface() -> FileResponse:
-    return FileResponse(PUBLIC_DIR / "index.html")
+def interface():
+    return _file_or_fallback(
+        PUBLIC_DIR / "index.html",
+        media_type="text/html",
+        fallback=(
+            "<!doctype html><html><head><title>QueueStorm Investigator</title></head>"
+            "<body><h1>QueueStorm Investigator</h1><p>API is running.</p>"
+            "<p><a href='/health'>Health</a> <a href='/docs'>Docs</a></p></body></html>"
+        ),
+    )
 
 
 @app.get("/styles.css", include_in_schema=False)
-def styles() -> FileResponse:
-    return FileResponse(PUBLIC_DIR / "styles.css", media_type="text/css")
+def styles():
+    return _file_or_fallback(PUBLIC_DIR / "styles.css", media_type="text/css", fallback="")
 
 
 @app.get("/app.js", include_in_schema=False)
-def script() -> FileResponse:
-    return FileResponse(PUBLIC_DIR / "app.js", media_type="application/javascript")
+def script():
+    return _file_or_fallback(PUBLIC_DIR / "app.js", media_type="application/javascript", fallback="")
 
 
 @app.get("/health", response_model=HealthResponse)
