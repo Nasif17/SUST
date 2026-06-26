@@ -94,7 +94,7 @@ It loads sample tickets, validates transaction history JSON, calls the analyzer 
 
 This repository includes Vercel configuration:
 
-- `pyproject.toml` sets the ASGI entrypoint to `app.main:app`, which Vercel uses to find the FastAPI app.
+- `pyproject.toml` defines the Python project/dependencies and sets `app.main:app` as the Vercel ASGI entrypoint.
 - `.python-version` pins Python `3.12`.
 - `public/` contains the static interface assets.
 
